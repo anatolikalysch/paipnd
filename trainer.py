@@ -9,6 +9,7 @@ from torch.autograd import Variable
 from torchvision import datasets, transforms, models
 
 
+# TODO: extend nn.Module
 class NNTrainer:
 
     def __init__(self, args):
@@ -50,7 +51,7 @@ class NNTrainer:
                                     lr=args.learning_rate,
                                     eps=args.epsilon_value)
 
-        if self.gpu:
+        if self.gpu and torch.cuda.is_available():
             self.model = self.model.cuda()
             self.criterion = self.criterion.cuda()
             print('[*] cuda init completed loaded')
@@ -113,12 +114,6 @@ class NNTrainer:
         for param in self.model.parameters():
             param.requires_grad = False
 
-        default_units = {
-            'vgg13': '25088, 6552, 1024, 512, 104',
-            'vgg16': '25088, 6552, 1024, 512, 104',
-            'vgg19': '25088, 6552, 1024, 512, 104'
-        }
-
         if self.hidden_units is None:
             self.model.classifier = torch.nn.Sequential(
                 OrderedDict([
@@ -135,7 +130,6 @@ class NNTrainer:
             )
 
         else:
-            # out_features = len([i for i in os.listdir(self.train_dir)])
 
             hidden_units = self.hidden_units.split(',')
             hidden_number = len(hidden_units)
@@ -153,32 +147,9 @@ class NNTrainer:
                 )
             )
 
-        # first
-        #         first = [nn.Linear(25088, int(hidden_units[0])), relu, dropout]
-
-        # middle
-        # middle = []
-
-    #         if hidden_number > 1:
-    #             for i in range(hidden_number - 1):
-    #                 middle.append(nn.Linear(int(hidden_units[i]), int(hidden_units[i + 1])))
-    #                 middle.append(relu)
-    #                 middle.append(dropout)
-
-    #         else:
-    #         middle.append(nn.Linear(2048, 1024))
-    #         middle.append(relu)
-    #         middle.append(dropout)
-    # last
-    #         last = [nn.Linear(int(hidden_units[-1]), out_features)]
-
-    #         self.model.classifier = nn.Sequential(first, middle, last, output)
 
     def train(self):
 
-        # GPU model configuration is handled during setup
-        # if self.gpu:
-        #     self.model = self.model.cuda()
 
         print('[*] Training started')
 
@@ -190,7 +161,7 @@ class NNTrainer:
         for e in range(self.epochs):
             for img, labels in iter(self.dataloaders['train']):
 
-                if self.gpu:
+                if self.gpu and torch.cuda.is_available():
                     img, labels = img.cuda(), labels.cuda()
 
                 steps += 1
@@ -214,7 +185,7 @@ class NNTrainer:
                     val_loss = 0
                     for i, (img, labels) in enumerate(self.dataloaders['valid']):
 
-                        if self.gpu:
+                        if self.gpu and torch.cuda.is_available():
                             img, labels = img.cuda(), labels.cuda()
 
                         with torch.no_grad():  # volatile is deprecated so we use no_grad to not save the history
@@ -256,7 +227,7 @@ class NNTrainer:
 
         for i, (img, labels) in enumerate(self.dataloaders['test']):
 
-            if self.gpu:
+            if self.gpu and torch.cuda.is_available():
                 img, labels = img.cuda(), labels.cuda()
 
             inputs = Variable(img, volatile=True)

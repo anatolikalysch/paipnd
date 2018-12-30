@@ -12,9 +12,6 @@ def crop_center(size):
     # crop out the center 224x224 part
     width, height = size
     actual_width, actual_height = (224, 224)
-    #
-    # ladd = lambda a, b: (a + b) / 2
-    # lsub = lambda a, b: (a - b) / 2
 
     left = (width - actual_width) / 2
     top = (height - actual_height) / 2
@@ -116,7 +113,7 @@ class Predictor:
         img = torch.FloatTensor([img])
 
         # Configure use of gpu
-        if self.gpu:
+        if self.gpu and torch.cuda.is_available():
             self.model.cuda()
             img = img.cuda()
 
