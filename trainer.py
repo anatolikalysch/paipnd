@@ -6,6 +6,7 @@ import torch
 from torch import nn
 from torch import optim
 from torch.autograd import Variable
+from torch.nn import Module
 from torchvision import datasets, transforms, models
 
 
@@ -14,6 +15,7 @@ class NNTrainer:
 
     def __init__(self, args):
 
+        super().__init__()
         assert args.data_dir is not None  # should never happen
         self.data_dir = args.data_dir
         self.train_dir = os.path.join(self.data_dir, 'train')
@@ -135,9 +137,9 @@ class NNTrainer:
             hidden_number = len(hidden_units)
             seq = []
             seq.append(('dropout1', nn.Dropout()))
-            for hu in range(hidden_number-1):
-                seq.append(('fc{}'.format(hu+1), nn.Linear(int(hidden_units[hu]), int(hidden_units[hu+1]))))
-                seq.append(('relu{}'.format(hu+1), nn.ReLU()))
+            for hu in range(hidden_number - 1):
+                seq.append(('fc{}'.format(hu + 1), nn.Linear(int(hidden_units[hu]), int(hidden_units[hu + 1]))))
+                seq.append(('relu{}'.format(hu + 1), nn.ReLU()))
 
             seq.pop(-1)
             seq.append(('output', nn.LogSoftmax(dim=1)))
@@ -147,9 +149,7 @@ class NNTrainer:
                 )
             )
 
-
     def train(self):
-
 
         print('[*] Training started')
 
@@ -269,3 +269,13 @@ class NNTrainer:
 
         checkpoint_path = os.path.relpath('{}_{}_udacity_ai.pth'.format(time.time(), self.arch))
         torch.save(checkpoint, checkpoint_path)
+
+
+class FlowerNetModule(nn.Module):
+
+    def __init__(self, args):
+        super().__init__()
+        self.model = self.__init_model__()
+
+    def __init_model__(self, args):
+        pass
