@@ -279,3 +279,18 @@ class FlowerNetModule(nn.Module):
 
     def __init_model__(self, args):
         pass
+
+    def forward(self, *input):
+        pass
+
+    def apply(self, fn):
+        pass
+
+    def cuda(self, device=None):
+        pass
+
+    def save(self):
+        pass
+
+    def load(self):
+        pass
